@@ -8,7 +8,7 @@ import yaml
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 from hmi_text_list_author_checks import ROOT, expected_documents, parse_candidate
-from hmi_text_list_generation_checks import local_reader, expected_intent as bool_intent
+from hmi_text_list_generation_checks import local_reader as local_reader, expected_intent as bool_intent
 from hmi_numeric_generation_checks import expected_intent as numeric_intent, expected_coverage, expected_changes, retained
 from hmi_dependency_impact_checks import verify as verify_dependencies
 from hmi_coordinated_generation_checks import verify as verify_v1

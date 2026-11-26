@@ -26,7 +26,7 @@ internal static class UaIdentityChecks
         void Reject(Action action, string code, string name)
         {
             try { action(); } catch (BridgeException e) when (e.Code == code) { check(true, name); return; }
-            throw new Exception("Expected " + code + ": " + name);
+            throw new InvalidOperationException("Expected " + code + ": " + name);
         }
         string root = Path.Combine(output, "identity"); var vault = new CredentialVault(root);
         string recordPath = Path.Combine(root, "ua-client-identity.json");
@@ -111,7 +111,7 @@ internal static class UaIdentityChecks
         try { file.SetAccessControl(unsafeAcl); Reject(() => vault.OpenUaIdentity(), "CredentialAclUnsafe", "Widened identity ACL refuses"); }
         finally { var restore = new FileSecurity(); restore.SetSecurityDescriptorSddlForm(originalAcl.GetSecurityDescriptorSddlForm(AccessControlSections.Access | AccessControlSections.Owner), AccessControlSections.Access | AccessControlSections.Owner); file.SetAccessControl(restore); }
         string alias = Path.Combine(root, "alias");
-        if (!Links.CreateHardLink(alias, recordPath, IntPtr.Zero)) throw new Exception("Hard-link fixture failed");
+        if (!Links.CreateHardLink(alias, recordPath, IntPtr.Zero)) throw new InvalidOperationException("Hard-link fixture failed");
         try { Reject(() => vault.OpenUaIdentity(), "InvalidResourceKey", "Hard-linked identity record refuses"); }
         finally { File.Delete(alias); }
         foreach (bool future in new[] { false, true })
@@ -147,8 +147,8 @@ internal static class UaIdentityChecks
         foreach (var arg in new[] { typeof(UaIdentityChecks).Assembly.Location, "--ua-probe", root }) info.ArgumentList.Add(arg);
         using var process = Process.Start(info)!;
         var text = process.StandardOutput.ReadToEndAsync(); var error = process.StandardError.ReadToEndAsync();
-        if (!process.WaitForExit(30000)) { process.Kill(); process.WaitForExit(); throw new Exception("Owned identity probe timed out"); }
-        if (process.ExitCode != 0 || error.GetAwaiter().GetResult().Length != 0) throw new Exception("Identity probe failed");
+        if (!process.WaitForExit(30000)) { process.Kill(); process.WaitForExit(); throw new InvalidOperationException("Owned identity probe timed out"); }
+        if (process.ExitCode != 0 || error.GetAwaiter().GetResult().Length != 0) throw new InvalidOperationException("Identity probe failed");
         return text.GetAwaiter().GetResult().Trim();
     }
 

@@ -28,7 +28,7 @@ internal static partial class RuntimeCaptureSoakChecks
             return Task.CompletedTask;
         });
         if (!waits.SequenceEqual(new[] { 60000d, 1d, 1d }) || elapsed != TimeSpan.FromSeconds(60) || observations.Count != 0)
-            throw new Exception("Early acquisition timers must rewait to the measured deadline with positive ceiling waits.");
+            throw new InvalidOperationException("Early acquisition timers must rewait to the measured deadline with positive ceiling waits.");
         await WaitForAcquisition(TimeSpan.FromSeconds(60), () => TimeSpan.FromSeconds(60),
             _ => throw new Exception("An exact acquisition deadline must not wait again."));
         await WaitForAcquisition(TimeSpan.FromSeconds(60), () => TimeSpan.FromMilliseconds(60000.1),

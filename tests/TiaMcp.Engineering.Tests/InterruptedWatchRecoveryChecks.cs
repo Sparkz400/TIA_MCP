@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -12,9 +13,9 @@ internal static class InterruptedWatchRecoveryChecks
         int passed = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); passed++; }
         async Task Reject(Func<Task> action, string code)
-        { try { await action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new Exception("Expected " + code); }
+        { try { await action(); } catch (BridgeException error) when (error.Code == code) { passed++; return; } throw new InvalidOperationException("Expected " + code); }
         async Task Lost(Func<Task> action)
-        { try { await action(); } catch (IOException) { return; } throw new Exception("Expected authored response loss"); }
+        { try { await action(); } catch (IOException) { return; } throw new InvalidOperationException("Expected authored response loss"); }
         async Task<Fixture> New(string name, bool lostCheckpoint = false)
         {
             string root = Path.Combine(Path.GetTempPath(), "interrupted-watch-" + name + "-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
@@ -104,12 +105,12 @@ internal static class InterruptedWatchRecoveryChecks
         string originalFile = Path.Combine(linked.Root, "unrelated.bin"); File.WriteAllBytes(originalFile, [42]);
         if (OperatingSystem.IsWindows())
         {
-            if (!CreateHardLink(Path.Combine(linkedDestination, "linked.bin"), originalFile, IntPtr.Zero)) throw new Exception("Cannot create hard-link regression fixture: " + Marshal.GetLastWin32Error());
+            if (!CreateHardLink(Path.Combine(linkedDestination, "linked.bin"), originalFile, IntPtr.Zero)) throw new InvalidOperationException("Cannot create hard-link regression fixture: " + Marshal.GetLastWin32Error());
             linked.Native.NewInstance(); await Reject(() => Reconcile(linked, "retainedPartial"), "InvalidResourceKey");
         }
 
         var bounded = await New("bounded"); string boundedDestination = AdmitDestination(bounded); Directory.CreateDirectory(boundedDestination);
-        for (int i = 0; i < 4097; i++) File.WriteAllBytes(Path.Combine(boundedDestination, i.ToString("D4") + ".bin"), []);
+        for (int i = 0; i < 4097; i++) File.WriteAllBytes(Path.Combine(boundedDestination, i.ToString("D4", CultureInfo.InvariantCulture) + ".bin"), []);
         bounded.Native.NewInstance(); await Reject(() => Reconcile(bounded, "retainedPartial"), "RecoveryInspectionLimit");
 
         foreach (var change in new (string Name, string Code, Action<JsonObject> Alter)[]

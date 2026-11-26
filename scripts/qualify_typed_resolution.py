@@ -18,7 +18,7 @@ from xml.etree import ElementTree as ET
 from block_test_runtime import NativeToolError, canonical, utc_now
 from qualification_owned_scratch import OwnedScratch, assert_snapshot, complete_inventory, native_hash, require, snapshot
 from run_block_tests import save_json
-from run_conformance import native_document, safe_xml, structural_xml
+from run_conformance import native_document, safe_xml, structural_xml as structural_xml
 from smoke_mcp import ROOT
 from typed_graphical_resolution_cases import MANIFEST, bind_case
 from typed_graphical_transport import artifact_bytes

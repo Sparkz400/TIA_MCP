@@ -1,3 +1,4 @@
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 using TiaMcp.Simulation;
 
@@ -200,7 +201,7 @@ internal static class SimulationRuntimeControlTests
         Check.Equal(null, SimulationRuntimeControl.UnlistedSymbol(["\"Missing\".X"], []));
         // Only the adapter's own newest reports stay; other files in the folder are never listed for deletion.
         var now = new DateTime(2026, 11, 20, 12, 0, 0, DateTimeKind.Utc);
-        string Report(int n) => "C:/r/simulation-test-" + n.ToString("x32") + ".json";
+        string Report(int n) => "C:/r/simulation-test-" + n.ToString("x32", CultureInfo.InvariantCulture) + ".json";
         var files = Enumerable.Range(0, 5).Select(n => (Report(n), now.AddMinutes(n))).Append(("C:/r/notes.json", now.AddDays(-9))).Append(("C:/r/simulation-test-keep.json", now.AddDays(-9))).ToArray();
         Check.Equal(string.Join(",", Report(1), Report(0)), string.Join(",", SimulationRuntimeControl.ExcessReports(files, 3)));
         Check.Equal(0, SimulationRuntimeControl.ExcessReports(files, 50).Count);

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -7,12 +8,12 @@ using TiaMcp.Core.Safety;
 if (args.Length != 1 || Directory.Exists(args[0]) || File.Exists(args[0])) throw new ArgumentException("Supply one fresh fixture output directory.");
 string output = Path.GetFullPath(args[0]); Directory.CreateDirectory(output);
 int checks = 0;
-void Check(bool ok, string text) { if (!ok) throw new Exception(text); checks++; }
+void Check(bool ok, string text) { if (!ok) throw new InvalidOperationException(text); checks++; }
 void Refuse(Action action, string label)
 {
     try { action(); }
     catch (Exception e) when (e is BridgeException or JsonException or DecoderFallbackException) { checks++; return; }
-    throw new Exception("Expected refusal: " + label);
+    throw new InvalidOperationException("Expected refusal: " + label);
 }
 const string plc = "/projects/Fixture/devices/Station/plc/CPU日本", file = "C:/synthetic/Fixture.ap21";
 var review = new JsonObject { ["model"] = new JsonObject { ["project"] = new JsonObject { ["projectPath"] = file },
@@ -120,7 +121,7 @@ Check(JsonNode.DeepEquals(withSources, store.Review(id, plc, small.Ref, large.Re
 var reversedRole = store.Review(id, plc, small.Ref, large.Ref, new JsonArray(Source("before")));
 Check((string)reversedRole["recordId"]! != sourceRecord, "Source role participates in record identity");
 Check(store.Review(id, plc, small.Ref, large.Ref, new JsonArray(Source("before"), Source("after")))["sources"]!.AsArray().Count == 2, "Identical bytes in distinct phases remain valid supplied roles");
-foreach (var invalidSources in new[] { new JsonArray(Source("invalid")), new JsonArray(Source(), Source()), new JsonArray(new JsonObject { ["uploadRef"] = support.Ref, ["phase"] = null, ["purpose"] = "x" }), new JsonArray(Source("context", "bad\n")), new JsonArray(Enumerable.Range(0,17).Select(i => (JsonNode)Source("context", i.ToString())).ToArray()) })
+foreach (var invalidSources in new[] { new JsonArray(Source("invalid")), new JsonArray(Source(), Source()), new JsonArray(new JsonObject { ["uploadRef"] = support.Ref, ["phase"] = null, ["purpose"] = "x" }), new JsonArray(Source("context", "bad\n")), new JsonArray(Enumerable.Range(0,17).Select(i => (JsonNode)Source("context", i.ToString(CultureInfo.InvariantCulture))).ToArray()) })
     Refuse(() => store.Review(id, plc, small.Ref, large.Ref, invalidSources), "Malformed source declarations");
 var manySources = new JsonArray(Enumerable.Range(0,16).Select(i => (JsonNode)Source("context", new string('日', 250) + i)).ToArray());
 var crowded = store.Review(id, plc, small.Ref, large.Ref, manySources);
@@ -154,14 +155,14 @@ Refuse(() => Build(Changed(s => s["block"]!["path"] = plc + "Other/blocks/Main")
 Refuse(() => SafetyEvidenceReview.Parse(Encoding.UTF8.GetBytes("{\"nested\":{\"a\":1,\"a\":2}}")), "Nested duplicate field");
 Refuse(() => SafetyEvidenceReview.Parse(Encoding.UTF8.GetBytes(new string('[',33) + new string(']',33))), "Depth limit");
 foreach (string section in new[] { "programSignatures", "blockSignatures", "settings", "runtimeGroups" })
-    Refuse(() => Build(Changed(s => s[section] = new JsonArray(Enumerable.Range(0, section.EndsWith("Signatures") ? 129 : 4097).Select(i => (JsonNode)new JsonObject { ["type"] = i.ToString(), ["name"] = i.ToString(), ["value"] = 1UL }).ToArray()))), "Row bound " + section);
+    Refuse(() => Build(Changed(s => s[section] = new JsonArray(Enumerable.Range(0, section.EndsWith("Signatures") ? 129 : 4097).Select(i => (JsonNode)new JsonObject { ["type"] = i.ToString(CultureInfo.InvariantCulture), ["name"] = i.ToString(CultureInfo.InvariantCulture), ["value"] = 1UL }).ToArray()))), "Row bound " + section);
 var noBlock = Changed(s => { s.Remove("block"); s.Remove("blockSignatures"); s.Remove("blockSignatureServiceAvailable"); s["programSignatures"] = new JsonArray(); });
 var withoutBlock = SafetyEvidenceReview.Build(id, review, plc, Bytes(noBlock), Bytes(noBlock));
 Check((int)withoutBlock["summary"]!["changeCount"]! == 0 && (int)withoutBlock["summary"]!["issueCount"]! == 2, "Whole PLC capture with empty signatures remains incomplete evidence");
-var maximal = Changed(s => { foreach (string section in new[] { "settings", "runtimeGroups" }) s[section] = new JsonArray(Enumerable.Range(0,4096).Select(i => (JsonNode)new JsonObject { ["name"] = i.ToString(), ["value"] = i }).ToArray()); });
+var maximal = Changed(s => { foreach (string section in new[] { "settings", "runtimeGroups" }) s[section] = new JsonArray(Enumerable.Range(0,4096).Select(i => (JsonNode)new JsonObject { ["name"] = i.ToString(CultureInfo.InvariantCulture), ["value"] = i }).ToArray()); });
 Check((int)Build(maximal)["summary"]!["changeCount"]! == 8194, "Bounded maximum settings/groups compare without loss");
 var bigSupport = Upload(new byte[16 * 1024 * 1024], "bounded.bin");
-var totalSources = new JsonArray(Enumerable.Range(0,5).Select(i => (JsonNode)new JsonObject { ["uploadRef"] = bigSupport.Ref, ["phase"] = "context", ["purpose"] = i.ToString() }).ToArray());
+var totalSources = new JsonArray(Enumerable.Range(0,5).Select(i => (JsonNode)new JsonObject { ["uploadRef"] = bigSupport.Ref, ["phase"] = "context", ["purpose"] = i.ToString(CultureInfo.InvariantCulture) }).ToArray());
 int retainedBefore = Directory.GetFiles(Path.Combine(root, "safety-evidence-reviews")).Length;
 Refuse(() => store.Review(id, plc, small.Ref, large.Ref, totalSources), "Repeated source roles count toward total byte limit");
 Check(Directory.GetFiles(Path.Combine(root, "safety-evidence-reviews")).Length == retainedBefore, "Failed source admission publishes no retained artifacts");

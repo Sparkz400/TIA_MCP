@@ -1,14 +1,15 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
 using TiaMcp.Core.WatchTables;
 
 if (args.Length != 3) throw new ArgumentException("Usage: <new-output> <reorder-run> <delete-run>. Retained native evidence roots are required; this test never starts TIA.");
 string destination = Path.GetFullPath(args[0]);
-if (Directory.Exists(destination)) throw new Exception("Preserve previous evidence.");
+if (Directory.Exists(destination)) throw new InvalidOperationException("Preserve previous evidence.");
 Directory.CreateDirectory(destination);
 var results = new List<object>(); int failed = 0;
 void Check(string name, Action action) { try { action(); results.Add(new { name, passed = true }); Console.WriteLine("PASS " + name); } catch (Exception e) { failed++; results.Add(new { name, passed = false, error = e.Message }); Console.WriteLine("FAIL " + name + ": " + e.Message); } }
-void Require(bool value) { if (!value) throw new Exception("Independent fixture assertion failed"); }
+void Require(bool value) { if (!value) throw new InvalidOperationException("Independent fixture assertion failed"); }
 byte[] NativeInput(string run)
 {
     var review = JsonDocument.Parse(File.ReadAllText(Path.Combine(run, "review.json")));
@@ -22,7 +23,7 @@ foreach (var test in new[] { (Name: "reorder", Bytes: reorder, Count: 16), (Name
     Check(test.Name + " explicit preorder candidate and immutable source", () => {
         var document = new WatchTableDocument(test.Bytes); var original = document.ToBytes();
         var mapping = document.ReindexReferenceFreeDocumentIds();
-        Require(mapping.Count == test.Count && mapping.Values.SequenceEqual(Enumerable.Range(0, test.Count).Select(i => i.ToString("X"))));
+        Require(mapping.Count == test.Count && mapping.Values.SequenceEqual(Enumerable.Range(0, test.Count).Select(i => i.ToString("X", CultureInfo.InvariantCulture))));
         Require(test.Bytes.SequenceEqual(original));
         File.WriteAllBytes(Path.Combine(destination, test.Name + ".xml"), document.ToBytes());
         File.WriteAllText(Path.Combine(destination, test.Name + "-mapping.json"), JsonSerializer.Serialize(mapping));

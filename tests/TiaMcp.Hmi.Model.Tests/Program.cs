@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using TiaMcp.Openness.V21;
 
 int checks = 0;
-void Check(bool value, string label) { if (!value) throw new Exception(label); checks++; }
+void Check(bool value, string label) { if (!value) throw new InvalidOperationException(label); checks++; }
 JObject Result(params JObject[] edges) => new() { ["edges"] = new JArray(edges), ["truncated"] = false, ["payloadBytes"] = 0 };
 JObject Edge(string id, string source = "/hmi/screen/item", string target = null, string kind = "hmiBinding", int padding = 0) => new()
 {

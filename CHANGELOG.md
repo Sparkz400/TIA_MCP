@@ -10,6 +10,10 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
+### Changed
+
+- CI: the ruff gate also enforces F401, F841 and F402 (unused imports and locals, imports shadowed by a loop variable) now that the scripts have none.
+
 ## [0.9.0] - 2026-11-25
 
 First tagged pre-release. Changes since the repository went public on 23 October 2026, up to feature catalog `0.5.0`

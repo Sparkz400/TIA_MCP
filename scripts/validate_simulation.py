@@ -148,7 +148,7 @@ def main(argv=None):
             report["hostBuild"] = call("host_build_identity")
         call("tia_start")
         attached = True
-        opened = call("project_open", {"path": str(project)})
+        call("project_open", {"path": str(project)})
         call("sim_status")
         if args.provision_runtime_credential:
             report["discoveryBaseline"] = call("simulation_discovery_baseline")["baseline"]

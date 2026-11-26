@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -37,7 +38,7 @@ internal static class SubscriptionInputChecks
             check(options.UnmappedMemberHandling == JsonUnmappedMemberHandling.Skip, name + " shared serializer options unchanged");
             var oldNode = JsonNode.Parse(minimal)!["nodes"]![0]!; oldNode["legacyExtra"] = true;
             check(JsonSerializer.Deserialize<OpcUaRuntimeNode>(oldNode, options) == expected.Nodes[0], name + " existing shared node deserialization unchanged");
-            var many = expected with { Nodes = Enumerable.Range(0,64).Select(i => new OpcUaRuntimeNode("urn:fixture","numeric",i.ToString())).ToArray() };
+            var many = expected with { Nodes = Enumerable.Range(0,64).Select(i => new OpcUaRuntimeNode("urn:fixture","numeric",i.ToString(CultureInfo.InvariantCulture))).ToArray() };
             var roundtrip = JsonSerializer.Deserialize<OpcUaSubscriptionRequest>(JsonSerializer.Serialize(many, options), options)!;
             check(roundtrip.Nodes.SequenceEqual(many.Nodes), name + " full node bound preserves exact identities");
         }

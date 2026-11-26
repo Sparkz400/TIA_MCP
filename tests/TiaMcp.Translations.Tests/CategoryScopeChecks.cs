@@ -9,7 +9,7 @@ internal static class CategoryScopeChecks
 {
     internal static int Probe(string casePath, string outputPath)
     {
-        if (File.Exists(outputPath)) throw new Exception("Use a new probe verification output path.");
+        if (File.Exists(outputPath)) throw new InvalidOperationException("Use a new probe verification output path.");
         var manifest = JsonNode.Parse(File.ReadAllText(casePath))!;
         var workbooks = new Dictionary<string, TranslationWorkbook>(StringComparer.Ordinal);
         var reads = new JsonArray();
@@ -25,16 +25,16 @@ internal static class CategoryScopeChecks
             {
                 var read = workbook.Read(row!["nativeKey"]!.GetValue<string>(), "en-GB");
                 if (read.Source.Text != row["source"]!.GetValue<string>() || read.Target.Text != row["target"]!.GetValue<string>())
-                    throw new Exception("Managed text differs from independent complete ZIP/XML decoding.");
+                    throw new InvalidOperationException("Managed text differs from independent complete ZIP/XML decoding.");
             }
             if (profile.Rows.Length != item["rows"]!.AsArray().Count || !bytes.SequenceEqual(workbook.OriginalBytes()) ||
                 TranslationInspection.Page(workbook, 1000)["rows"]!.AsArray().Count != profile.Rows.Length)
-                throw new Exception("Complete row coverage, inspection or original-byte preservation differs.");
+                throw new InvalidOperationException("Complete row coverage, inspection or original-byte preservation differs.");
             if (profile.Rows.Length > 0)
             {
                 var first = profile.Rows[0]; var pair = workbook.Read(first.NativeKey, "en-GB");
                 var edit = new TranslationEdit(first.NativeKey, "en-GB", TranslationEditKind.Set, "refusal probe", pair.Source.Sha256, pair.Target.Sha256, true, "test reviewer");
-                if (TranslationReview.Review(workbook, workbook, [edit])["canWriteOfflineCandidate"]!.GetValue<bool>()) throw new Exception("Unqualified native profile allowed a changed candidate.");
+                if (TranslationReview.Review(workbook, workbook, [edit])["canWriteOfflineCandidate"]!.GetValue<bool>()) throw new InvalidOperationException("Unqualified native profile allowed a changed candidate.");
             }
             totalRows += profile.Rows.Length; workbooks.Add(mode, workbook);
             reads.Add(new JsonObject { ["mode"] = mode, ["rows"] = profile.Rows.Length, ["workbookSha256"] = workbook.WorkbookSha256,
@@ -53,7 +53,7 @@ internal static class CategoryScopeChecks
                 report["outOfCategoryKeys"]!.AsArray().Count != test["outOfCategoryRows"]!.GetValue<int>() ||
                 report["matchesRequestedCategoryIntersection"]!.GetValue<bool>() != test["matchesIntersection"]!.GetValue<bool>() ||
                 report["restrictiveFilteringDemonstrated"]!.GetValue<bool>() || report["nativeImportAllowed"]!.GetValue<bool>())
-                throw new Exception("Managed scope report differs from the independent request/row oracle or grants qualification.");
+                throw new InvalidOperationException("Managed scope report differs from the independent request/row oracle or grants qualification.");
             comparisons.Add(new JsonObject { ["baselineMode"] = test["baselineMode"]!.DeepClone(), ["selectedMode"] = test["selectedMode"]!.DeepClone(), ["comparison"] = report });
         }
         var result = new JsonObject { ["kind"] = "managed-native-category-probe-read-verification", ["allPassed"] = true, ["nativeInvoked"] = false,
@@ -66,7 +66,7 @@ internal static class CategoryScopeChecks
 
     internal static int Run(string casePath, string outputPath)
     {
-        if (File.Exists(outputPath)) throw new Exception("Use a new category-scope output path.");
+        if (File.Exists(outputPath)) throw new InvalidOperationException("Use a new category-scope output path.");
         var cases = JsonNode.Parse(File.ReadAllText(casePath))!.AsArray();
         TranslationWorkbook Open(string mode, Func<WorkbookProfile, WorkbookProfile>? alter = null, byte[]? bytes = null,
             Func<EngineeringObjectReference, EngineeringObjectReference>? identityAlter = null)
@@ -84,9 +84,9 @@ internal static class CategoryScopeChecks
         string[] hardware = ["HwcnCommentTextCategoryData"];
         var checks = new JsonArray();
         void Check(string name, Action action) { action(); checks.Add(name); }
-        void Assert(bool condition) { if (!condition) throw new Exception("Category-scope assertion failed."); }
+        void Assert(bool condition) { if (!condition) throw new InvalidOperationException("Category-scope assertion failed."); }
         void Reject(string code, Action action)
-        { try { action(); } catch (BridgeException ex) { Assert(ex.Code == code); return; } throw new Exception("Expected " + code); }
+        { try { action(); } catch (BridgeException ex) { Assert(ex.Code == code); return; } throw new InvalidOperationException("Expected " + code); }
         JsonObject Compare(TranslationWorkbook selected) => TranslationCategoryScope.Compare(baseline, selected, hardware, labels);
         var comparison = Compare(category);
         Check("genuine category leakage is rejected", () => {

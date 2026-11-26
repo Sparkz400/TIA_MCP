@@ -12,7 +12,7 @@ internal static class TextListGenerationTests
         var reviews = new ProjectReviewStore(root); var uploads = new ArtifactUploadStore(root); var store = new HmiComponentWorkflowStore(root);
         var uploadIds = new List<string>(); int checks = 0;
         void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
-        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or InvalidOperationException or ArgumentException) { checks++; return; } throw new Exception("Expected refusal: " + label); }
+        void Reject(Action action, string label) { try { action(); } catch (Exception e) when (e is BridgeException or JsonException or InvalidOperationException or ArgumentException) { checks++; return; } throw new InvalidOperationException("Expected refusal: " + label); }
         string Upload(byte[] data)
         {
             var started = uploads.Begin("input.json", data.Length, Hash(data)); uploadIds.Add(started.UploadId);

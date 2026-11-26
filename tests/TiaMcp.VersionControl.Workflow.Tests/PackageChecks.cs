@@ -11,7 +11,7 @@ internal static class PackageChecks
     public static async Task<int> Run(string root, string git, string first, string second)
     {
         int checks = 0;
-        void Check(bool value, string name) { if (!value) throw new Exception(name); checks++; Console.WriteLine("PASS package " + name); }
+        void Check(bool value, string name) { if (!value) throw new InvalidOperationException(name); checks++; Console.WriteLine("PASS package " + name); }
         var store = new VciWorkspaceStore(root, git); var uploads = new ArtifactUploadStore(root);
         JsonElement Json(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
         string Text(JsonElement value, string name) => value.GetProperty(name).GetString()!;
@@ -25,7 +25,7 @@ internal static class PackageChecks
         void Reject(string code, Action action)
         {
             try { action(); } catch (BridgeException error) { Check(error.Code == code, "rejects " + code + ": " + error.Code); return; }
-            throw new Exception("Expected " + code);
+            throw new InvalidOperationException("Expected " + code);
         }
         var snapshot = new EngineeringSnapshotIdentity("authored-mapping-fixture", new string('a', 64));
         var identity = new EngineeringObjectReference(new("D:/Fixture/P.ap21", "/PLC", null, "/PLC/Motor", "block"), snapshot);

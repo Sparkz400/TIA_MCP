@@ -7,7 +7,7 @@ internal static class NativeReadChecks
 {
     internal static int Run(string casePath, string outputPath)
     {
-        if (File.Exists(outputPath)) throw new Exception("Use a new native-read verification output path.");
+        if (File.Exists(outputPath)) throw new InvalidOperationException("Use a new native-read verification output path.");
         var cases = JsonNode.Parse(File.ReadAllText(casePath))!.AsArray();
         var results = new JsonArray();
         foreach (var item in cases)
@@ -23,18 +23,18 @@ internal static class NativeReadChecks
                 var values = workbook.Read(row!["nativeKey"]!.GetValue<string>(), "en-GB");
                 if (values.Source.Text != row["source"]!.GetValue<string>() || values.Target.Text != row["target"]!.GetValue<string>() ||
                     values.Source.RichText || values.Target.RichText)
-                    throw new Exception("Managed decoded value differs from the independent ZIP/XML reader.");
+                    throw new InvalidOperationException("Managed decoded value differs from the independent ZIP/XML reader.");
                 rows++;
             }
             if (rows != profile.Rows.Length || !bytes.AsSpan().SequenceEqual(workbook.OriginalBytes()))
-                throw new Exception("Capture row coverage or immutable original bytes differ.");
+                throw new InvalidOperationException("Capture row coverage or immutable original bytes differ.");
             var first = profile.Rows[0]; var pair = workbook.Read(first.NativeKey, "en-GB");
             var probe = new TranslationEdit(first.NativeKey, "en-GB", TranslationEditKind.Set,
                 "Read-only profile edit refusal probe", pair.Source.Sha256, pair.Target.Sha256, true, "test-only refusal");
             var refusal = TranslationReview.Review(workbook, workbook, [probe]);
-            if (refusal["canWriteOfflineCandidate"]!.GetValue<bool>()) throw new Exception("Native read profile unexpectedly permits a changed candidate.");
+            if (refusal["canWriteOfflineCandidate"]!.GetValue<bool>()) throw new InvalidOperationException("Native read profile unexpectedly permits a changed candidate.");
             var inspection = TranslationInspection.Page(workbook, 1000);
-            if (inspection["rows"]!.AsArray().Count != rows) throw new Exception("Paged native-read target count differs.");
+            if (inspection["rows"]!.AsArray().Count != rows) throw new InvalidOperationException("Paged native-read target count differs.");
             results.Add(new JsonObject { ["mode"] = test["mode"]!.GetValue<string>(), ["workbookSha256"] = workbook.WorkbookSha256,
                 ["profileSha256"] = workbook.ProfileSha256, ["rowsVerifiedAgainstIndependentReader"] = rows,
                 ["originalBytesUnchanged"] = true, ["changedCandidateBlocked"] = true,

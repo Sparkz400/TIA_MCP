@@ -130,7 +130,7 @@ Check("CAx parking lot rejects a removed existing row", "cax_import", new JObjec
 Check("CAx overwrite is recorded, not matched", "cax_import", new JObject { ["importOption"] = "OverwriteTiaDevice" }, rows => { rows.RemoveAt(1); rows[0]["attributes"]["Comment"] = "imported"; }, true);
 var caxAfter = Baseline(); caxAfter.RemoveAt(1); caxAfter[0]["attributes"]["Comment"] = "imported"; caxAfter.Add(Row(parked));
 if (HardwareEngineeringRules.Difference(Baseline(), caxAfter).ToString() != new JObject { ["added"] = new JArray(parked), ["removed"] = new JArray(module), ["changed"] = new JArray(station) }.ToString())
-    throw new Exception("CAx hardware difference differs.");
+    throw new InvalidOperationException("CAx hardware difference differs.");
 count++; Console.WriteLine("PASS CAx hardware difference by exact path");
 var assign = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 0, ["controllerHardwarePath"] = controller, ["controllerIndex"] = 0, ["addressControllerOwnerPath"] = controller };
 void Assigned(JArray rows) { rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["owners"] = new JArray(controller); }
@@ -169,9 +169,9 @@ Check("declared exact generated server", "network_io_assign", companion, Assigne
 string absentNativeType = null;
 var rawNativeNull = new JObject { ["typeIdentifier"] = absentNativeType };
 var explicitNull = new JObject { ["typeIdentifier"] = null };
-if (rawNativeNull.ToString() != explicitNull.ToString() || JToken.DeepEquals(rawNativeNull, explicitNull)) throw new Exception("Native nullable-string representation regression did not reproduce");
+if (rawNativeNull.ToString() != explicitNull.ToString() || JToken.DeepEquals(rawNativeNull, explicitNull)) throw new InvalidOperationException("Native nullable-string representation regression did not reproduce");
 if (HardwareEngineeringRules.MetadataString(absentNativeType).Type != JTokenType.Null || HardwareEngineeringRules.MetadataString("").Type != JTokenType.String)
-    throw new Exception("Native metadata capture confused null and empty string");
+    throw new InvalidOperationException("Native metadata capture confused null and empty string");
 count++; Console.WriteLine("PASS native string-null distinction reproduced and explicitly captured");
 Check("canonical native null companion", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = HardwareEngineeringRules.MetadataString(absentNativeType); }, true);
 Check("raw native string-null differs before capture fix", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = absentNativeType; }, false);
@@ -320,7 +320,7 @@ Check("replace losing a port link outside subtree rejected", "hardware_replace",
 var inventoryRows = Baseline(); WithChild(inventoryRows);
 var inventory = HardwareEngineeringRules.ReplaceInventory(inventoryRows, module);
 if (inventory.Value<string>("typeIdentifier") != "Catalog:DI" || ((JArray)inventory["addresses"]).Count != 1 || inventory["addresses"][0].Value<string>("hardwarePath") != module || !JToken.DeepEquals(inventory["children"], new JArray(child)))
-    throw new Exception("Replace inventory differs: " + inventory);
+    throw new InvalidOperationException("Replace inventory differs: " + inventory);
 count++; Console.WriteLine("PASS replace inventory lists subtree addresses and children");
 // Address-changing replacement: an address may move or resize with acceptAddressChange, but keeps its item, I/O type and owners.
 var replaceMove = (JObject)replace.DeepClone(); replaceMove["acceptAddressChange"] = true;
@@ -333,19 +333,19 @@ Check("address change losing a child rejected", "hardware_replace", replaceMove,
 var movedRows = Baseline(); WithChild(movedRows); Moved(movedRows);
 var addressMap = HardwareEngineeringRules.ReplaceAddressMap(HardwareEngineeringRules.ReplaceInventory(Baseline(), module), HardwareEngineeringRules.ReplaceInventory(movedRows, module));
 if (addressMap.Count != 1 || (int)addressMap[0]["before"]["startAddress"] != 0 || (int)addressMap[0]["after"]["startAddress"] != 4 || (int)addressMap[0]["after"]["lengthBits"] != 32 || !(bool)addressMap[0]["changed"])
-    throw new Exception("Address map differs: " + addressMap);
+    throw new InvalidOperationException("Address map differs: " + addressMap);
 count++; Console.WriteLine("PASS address map pairs the old and new range of one item and I/O type");
 var unchangedMap = HardwareEngineeringRules.ReplaceAddressMap(HardwareEngineeringRules.ReplaceInventory(Baseline(), module), HardwareEngineeringRules.ReplaceInventory(Baseline(), module));
 var tagOnModule = new JObject { ["path"] = "/plc/tags/T/tags/In", ["hardwarePath"] = module, ["ioType"] = "Input", ["startAddress"] = 0 };
 var changedTags = HardwareEngineeringRules.ChangedReferencedTags(new JArray(tagOnModule), addressMap);
 if (changedTags.Count != 1 || (int)changedTags[0]["rangeAfter"]["startAddress"] != 4 || HardwareEngineeringRules.ChangedReferencedTags(new JArray(tagOnModule), unchangedMap).Count != 0)
-    throw new Exception("Changed referenced tags differ: " + changedTags);
+    throw new InvalidOperationException("Changed referenced tags differ: " + changedTags);
 count++; Console.WriteLine("PASS referenced tags report only ranges that changed");
 var referencedTags = new JArray(tagOnModule, new JObject { ["path"] = "/plc/tags/T/tags/In2" });
 foreach (var (label, acknowledged, expected) in new[] { ("exact set", (JToken)new JArray("/plc/tags/T/tags/In2", "/plc/tags/T/tags/In"), true), ("missing tag", new JArray("/plc/tags/T/tags/In"), false),
     ("extra tag", new JArray("/plc/tags/T/tags/In", "/plc/tags/T/tags/In2", "/x"), false), ("no acknowledgement", null, false) })
-    if (HardwareEngineeringRules.TagsAcknowledged(referencedTags, acknowledged) != expected) throw new Exception("Tag acknowledgement differs: " + label); else { count++; Console.WriteLine("PASS tag acknowledgement: " + label); }
-if (!HardwareEngineeringRules.TagsAcknowledged(new JArray(), null)) throw new Exception("No referenced tag needs no acknowledgement."); count++;
+    if (HardwareEngineeringRules.TagsAcknowledged(referencedTags, acknowledged) != expected) throw new InvalidOperationException("Tag acknowledgement differs: " + label); else { count++; Console.WriteLine("PASS tag acknowledgement: " + label); }
+if (!HardwareEngineeringRules.TagsAcknowledged(new JArray(), null)) throw new InvalidOperationException("No referenced tag needs no acknowledgement."); count++;
 try { HardwareEngineeringRules.TagsAcknowledged(referencedTags, new JArray(1)); throw new Exception("Numeric acknowledgement accepted"); }
 catch (BridgeException error) when (error.Code == "InvalidRequest") { count++; Console.WriteLine("PASS malformed acknowledgedTags refused"); }
 // Shared device: a second connector of the IO device interface joins another controller's I/O system.
@@ -390,7 +390,7 @@ Check("diagnosis address of a shared submodule taking an owner rejected", "netwo
 Check("address count change of a station item rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[5]["addresses"] = new JArray(); }, false, SharedOther);
 if (!HardwareEngineeringRules.CapturesSharedAccess("network_io_assign", shared) || HardwareEngineeringRules.CapturesSharedAccess("network_io_assign", assign) || HardwareEngineeringRules.CapturesSharedAccess("network_io_assign", null)
     || !HardwareEngineeringRules.CapturesSharedAccess("hardware_shared_device_access", null) || HardwareEngineeringRules.CapturesSharedAccess("hardware_replace", shared))
-    throw new Exception("Shared-device attribute capture differs.");
+    throw new InvalidOperationException("Shared-device attribute capture differs.");
 count++; Console.WriteLine("PASS shared-device attributes join the manifest for a sharedDevice assignment and hardware_shared_device_access only");
 var peersWithoutShared = (JObject)assign.DeepClone(); peersWithoutShared["sharedAddressControllerOwnerPaths"] = new JArray("/other");
 Check("peer PLCs without sharedDevice rejected", "network_io_assign", peersWithoutShared, Assigned, false);
@@ -494,7 +494,7 @@ Check("external count changing unasked rejected", "hardware_shared_device_access
 Check("external count on an uncaptured interface row rejected", "hardware_shared_device_access", accessExternal, rows => { Outside(rows); ((JObject)rows[3]).Remove("attributes"); }, false, rows => { AccessExternalBase(rows); ((JObject)rows[3]).Remove("attributes"); });
 Check("count-only change of a module already outside the project", "hardware_shared_device_access", accessExternal, rows => rows[3]["attributes"]["NumberOfExternalIoControllers"] = 1,
     true, rows => { AccessExternalBase(rows); Outside(rows); });
-if (HardwareEngineeringRules.RequireExternalIoControllers(1) != 1 || HardwareEngineeringRules.RequireExternalIoControllers(HardwareEngineeringRules.MaxExternalIoControllers) != 32) throw new Exception("External controller bounds differ.");
+if (HardwareEngineeringRules.RequireExternalIoControllers(1) != 1 || HardwareEngineeringRules.RequireExternalIoControllers(HardwareEngineeringRules.MaxExternalIoControllers) != 32) throw new InvalidOperationException("External controller bounds differ.");
 count += 2;
 foreach (var token in new JToken[] { 0, -1, 33, int.MaxValue, 1.5, "2", JValue.CreateNull(), true })
 {
@@ -525,13 +525,13 @@ foreach (var (label, path, selector, name) in new[] { ("read-only attribute", ""
     catch (BridgeException error) when (error.Code == "AttributeNotWritable") { count++; Console.WriteLine("PASS profile refuses " + label); }
 }
 if (HardwareEngineeringRules.ProfilePath(new string[0], "Di") != "" || HardwareEngineeringRules.ProfilePath(new[] { "Di", "PROFINET%20interface", "Port_1" }, "Di") != "items/{module}/items/PROFINET%20interface/items/Port_1")
-    throw new Exception("Profile row paths differ.");
+    throw new InvalidOperationException("Profile row paths differ.");
 count++; Console.WriteLine("PASS profile row paths name the module's own segment {module}");
 if (HardwareEngineeringRules.ProfileKey("OrderNumber:X/V1.0", "V9") != "OrderNumber:X/V1.0" || HardwareEngineeringRules.ProfileKey("System:Rail", null) != null || HardwareEngineeringRules.ProfileKey("GSD:F/D", "V1.0") != "GSD:F/D|V1.0")
-    throw new Exception("Profile keys differ.");
+    throw new InvalidOperationException("Profile keys differ.");
 count++; Console.WriteLine("PASS versionless identifiers select a profile only with the item's firmware");
 if (HardwareEngineeringRules.ParseProfiles("{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"GSD:F/D\",\"firmwareVersion\":\"V1\"},{\"typeIdentifier\":\"GSD:F/D\",\"firmwareVersion\":\"V2\"}]}").Count != 2)
-    throw new Exception("Two firmware profiles of one versionless type were not told apart.");
+    throw new InvalidOperationException("Two firmware profiles of one versionless type were not told apart.");
 count++;
 var gsdProfiles = new[] { new JObject { ["typeIdentifier"] = "GSD:F/D", ["firmwareVersion"] = "V1.0" } };
 HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", "V1.0");
@@ -540,13 +540,13 @@ count += 2;
 // The catalog search names a versionless type's profiles by type alone: its entry's Version is the GSD file name, not a firmware.
 if (!HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:F/D") || HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:Other/D")
     || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, "OrderNumber:6ES7 131-6BF00-0BA0/V1.1"))
-    throw new Exception("Catalog profile links differ.");
+    throw new InvalidOperationException("Catalog profile links differ.");
 count++; Console.WriteLine("PASS catalog entries name their type's profiles, versionless ones without a firmware");
 // The bundled I-device GSD head profile (captured in rd1) is selected only by its FirmwareVersion and declares Comment, not InformationText.
 const string gsdHead = "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/DAP/DAP1";
 var gsdProfile = HardwareEngineeringRules.Profile(gsdHead, "V4.1");
 if (gsdProfile == null || HardwareEngineeringRules.Profile(gsdHead, null) != null || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, gsdHead))
-    throw new Exception("The bundled GSD head profile is not keyed by its firmware.");
+    throw new InvalidOperationException("The bundled GSD head profile is not keyed by its firmware.");
 HardwareEngineeringRules.RequireProfileWritable(gsdProfile, "", null, new[] { "Comment" });
 foreach (var (label, check) in new (string, Action)[] { ("an undeclared head attribute", () => HardwareEngineeringRules.RequireProfileWritable(gsdProfile, "", null, new[] { "InformationText" })),
     ("another firmware of the GSD head", () => HardwareEngineeringRules.RequireVersionlessMatch(HardwareEngineeringRules.BundledProfileList, gsdHead, "V4.0")) })
@@ -566,7 +566,7 @@ foreach (var (label, json) in new[] { ("duplicate type", "{\"schemaVersion\":1,\
     try { HardwareEngineeringRules.ParseProfiles(json); throw new Exception("Profile contract accepted: " + label); }
     catch (Exception error) when (error is InvalidOperationException || error is ArgumentException) { count++; Console.WriteLine("PASS profile contract refuses " + label); }
 }
-if (HardwareEngineeringRules.Profile("OrderNumber:6ES7 999-9XX99-9XX9/V9.9", null) != null || HardwareEngineeringRules.Profile(null, null) != null) throw new Exception("Bundled profiles answer an unknown type.");
+if (HardwareEngineeringRules.Profile("OrderNumber:6ES7 999-9XX99-9XX9/V9.9", null) != null || HardwareEngineeringRules.Profile(null, null) != null) throw new InvalidOperationException("Bundled profiles answer an unknown type.");
 count++; Console.WriteLine("PASS bundled profile contract loads");
 // Every attribute write that verified evidence performed must stay admitted once its type has a bundled profile.
 foreach (var (type, path, channelSelector, name, proof) in new[] {
@@ -582,7 +582,7 @@ foreach (var (type, path, channelSelector, name, proof) in new[] {
     ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "items/{module}", digital0, "HardwareInterruptRisingEdgeActive", "local.plcsim_gaps.ob40.20261030") })
 {
     try { HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(type, null), path, channelSelector, new[] { name }); count++; }
-    catch (BridgeException error) { throw new Exception("The bundled profile of " + type + " refuses " + name + ", which " + proof + " wrote: " + error.Message); }
+    catch (BridgeException error) { throw new InvalidOperationException("The bundled profile of " + type + " refuses " + name + ", which " + proof + " wrote: " + error.Message); }
 }
 Console.WriteLine("PASS bundled profiles admit every attribute write of the verified hardware evidence");
 // Interrupted-apply project disposition: an equal fingerprint releases only when nothing was saved after the checkpoint.
@@ -590,7 +590,7 @@ var archived = new DateTime(2026, 10, 27, 13, 0, 0, DateTimeKind.Utc);
 void Disposition(string name, bool equal, double savedSeconds, bool applied, string expected, string reason = null)
 {
     string actual = AdmissionReconcileRules.ApplyProject(equal, archived.AddSeconds(savedSeconds), archived, applied, out string basis);
-    if (actual != expected || reason != null && !basis.Contains(reason)) throw new Exception("Unexpected disposition: " + name + " -> " + (actual ?? "held") + ": " + basis);
+    if (actual != expected || reason != null && !basis.Contains(reason)) throw new InvalidOperationException("Unexpected disposition: " + name + " -> " + (actual ?? "held") + ": " + basis);
     count++; Console.WriteLine("PASS " + name);
 }
 Disposition("unsaved mutation lost releases unchanged", true, -1, false, "unchanged");
@@ -605,7 +605,7 @@ Disposition("differing unsaved project holds", false, -1, false, null, "differs 
 try { AdmissionReconcileRules.ApplyProject(true, DateTime.SpecifyKind(archived.AddSeconds(-1), DateTimeKind.Local), archived, false, out _); throw new Exception("Local save time accepted"); }
 catch (ArgumentException) { count++; Console.WriteLine("PASS non-UTC save time refused"); }
 // Provisioning reconciliation: storage outside the card from metadata only, and the credential's write-ahead stream.
-if (AdmissionReconcileRules.SavedUtc(DateTime.SpecifyKind(archived, DateTimeKind.Unspecified)) < archived) throw new Exception("An unspecified save time released early");
+if (AdmissionReconcileRules.SavedUtc(DateTime.SpecifyKind(archived, DateTimeKind.Unspecified)) < archived) throw new InvalidOperationException("An unspecified save time released early");
 count++;
 Newtonsoft.Json.Linq.JObject Entry(string path, bool directory = false, long bytes = 1, long ticks = 10) => new() { ["path"] = path, ["directory"] = directory,
     ["bytes"] = directory ? null : bytes, ["lastWriteUtcTicks"] = ticks, ["attributes"] = 32 };
@@ -613,7 +613,7 @@ var storageInventory = new Newtonsoft.Json.Linq.JArray(Entry(".download.claim"),
 void Storage(string name, Newtonsoft.Json.Linq.JArray current, params string[] expected)
 {
     var differences = AdmissionReconcileRules.ProvisionStorageDifferences(storageInventory, current, "a1");
-    if (differences.Count != expected.Length || expected.Any(e => !differences.Any(d => d.Contains(e)))) throw new Exception(name + ": " + string.Join(" ", differences));
+    if (differences.Count != expected.Length || expected.Any(e => !differences.Any(d => d.Contains(e)))) throw new InvalidOperationException(name + ": " + string.Join(" ", differences));
     count++; Console.WriteLine("PASS " + name);
 }
 var attemptFiles = new[] { Entry("simulation-provision-a1.json"), Entry("simulation-provision-a1.checkpoints.jsonl"), Entry(".provision.claim"), Entry("before-provision.zap21"),
@@ -631,7 +631,7 @@ string Record(string phase, bool opened = false, bool armed = false) => new Newt
 void Credential(string name, string[] lines, string expected)
 {
     string refusal = AdmissionReconcileRules.ProvisionCredentialRefusal(lines);
-    if (expected == null ? refusal != null : refusal?.Contains(expected) != true) throw new Exception(name + ": " + refusal);
+    if (expected == null ? refusal != null : refusal?.Contains(expected) != true) throw new InvalidOperationException(name + ": " + refusal);
     count++; Console.WriteLine("PASS " + name);
 }
 Credential("never-armed stream proves no credential", new[] { Record("attemptPrepared"), Record("afterPowerOff"), Record("attemptFinalized") }, null);
@@ -642,9 +642,9 @@ Credential("torn record holds", new[] { Record("attemptPrepared"), "{\"phase\":\
 Credential("empty stream holds", new string[0], "missing");
 Credential("missing flag holds", new[] { Record("attemptPrepared"), "{\"phase\":\"x\"}" }, "credentialOpened");
 foreach (var kind in new[] { "hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
-    if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
+    if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new InvalidOperationException("Target kind treated as recomputable: " + kind); else count++;
 foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
-    if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Covered kind treated as target-dependent: " + kind); else count++;
+    if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new InvalidOperationException("Covered kind treated as target-dependent: " + kind); else count++;
 // A failed apply journals what TIA said in MessageData/DetailMessageData, not only the generic Message.
 var native = new Siemens.Engineering.EngineeringException("Error when calling method 'ImportFromXlsx'.", new InvalidOperationException("inner"))
 {
@@ -654,7 +654,7 @@ var native = new Siemens.Engineering.EngineeringException("Error when calling me
 var chain = NativeFailureText.Chain(native);
 if (chain.Count != 2 || (string)chain[0]["text"] != "Import failed." || ((string)chain[0]["detail"]).Length != 2048 || ((JArray)chain[0]["details"]).Count != 16
     || (string)chain[0]["details"][0]["text"] != "The required worksheet 'TextList' is missing." || (string)chain[1]["message"] != "inner" || chain[1]["details"] != null)
-    throw new Exception("Native failure chain differs: " + chain);
+    throw new InvalidOperationException("Native failure chain differs: " + chain);
 count++; Console.WriteLine("PASS native failure chain keeps Siemens message data, bounded");
 count += RuntimeRouteChecks.Run();
 count += FParameterAllowlistChecks.Run();
@@ -668,8 +668,8 @@ count += DriveObjectChecks.Run();
 count += SafetyDriveGuardChecks.Run();
 // A project-wide setting compiles every device: one PLC's compile left the other PLC inconsistent and its fingerprint unavailable (sl2).
 foreach (var kind in new[] { "project_simulation_enable", "safety_import_xml", "safety_fparameter_set", "hardware_plug", "connection_create", "certificate_create", "opcua_server_settings_set", "network_mrp_set", "hardware_shared_device_access" })
-    if (!CompileOnlyRules.CompilesEveryDevice(kind)) throw new Exception("Device-compiled kind compiles one PLC: " + kind); else count++;
+    if (!CompileOnlyRules.CompilesEveryDevice(kind)) throw new InvalidOperationException("Device-compiled kind compiles one PLC: " + kind); else count++;
 foreach (var kind in new[] { "tag_create", "source_upsert", "to_create", "project_languages_set", "plc_compile" })
-    if (CompileOnlyRules.CompilesEveryDevice(kind)) throw new Exception("PLC-compiled kind compiles every device: " + kind); else count++;
+    if (CompileOnlyRules.CompilesEveryDevice(kind)) throw new InvalidOperationException("PLC-compiled kind compiles every device: " + kind); else count++;
 Console.WriteLine("PASS project_simulation_enable and the hardware/safety kinds compile every device");
 Console.WriteLine($"{count} hardware preservation checks passed.");

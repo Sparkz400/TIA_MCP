@@ -16,7 +16,7 @@ internal static class ParserRobustnessChecks
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "fixtures", "trace-diagnostics", "FB_Line.xml"))) directory = directory.Parent;
-        string fixtures = Path.Combine(directory?.FullName ?? throw new Exception("fixtures/trace-diagnostics is missing"), "fixtures");
+        string fixtures = Path.Combine(directory?.FullName ?? throw new InvalidOperationException("fixtures/trace-diagnostics is missing"), "fixtures");
         byte[][] blocks = new[] { "trace-diagnostics/FB_Line.xml", "trace-diagnostics/DB_Line.xml", "trace-diagnostics/FB_Conveyor.xml", "plcsim-process-image/PipCyclic.xml" }
             .Select(name => File.ReadAllBytes(Path.Combine(fixtures, name))).ToArray();
         foreach (byte[] block in blocks) ProjectReviewStore.XmlSignatures(Encoding.UTF8.GetString(block));
@@ -45,7 +45,7 @@ internal static class ParserRobustnessChecks
         for (int i = 0; i < 40; i++) lines.Add(FormattableString.Invariant($"{(i - 2) / 100m:0.00};{i % 2};{(i * 12.5m):0.0};{i}"));
         lines.Add("0.39;1;\"1500.5\";\"\"");
         byte[] csv = Encoding.UTF8.GetBytes(string.Join("\r\n", lines) + "\r\n");
-        if (TraceCsvReader.Convert(csv, Options(), plan, "trace-1", artifact)["samples"]!.AsArray().Count != 41) throw new Exception("The CSV baseline no longer imports.");
+        if (TraceCsvReader.Convert(csv, Options(), plan, "trace-1", artifact)["samples"]!.AsArray().Count != 41) throw new InvalidOperationException("The CSV baseline no longer imports.");
 
         string[] tokens = ["", "\"", "\"\"", ";", ";;;", ",", "\t", "\r", "\n", "\r\n", "1e400", "-", "NaN", "Infinity", "0x1F", "1,5", "1.5.5", "79228162514264337593543950336",
             "-79228162514264337593543950336", "0.0000000000000000000000000000001", "TRUE", "2", " 1", "1 ", "﻿", "\u0000", "seconds", new string('9', 4097), new string(';', 300)];
@@ -123,7 +123,7 @@ internal static class ParserRobustnessChecks
         Shape("timeColumn as an array", o => o["timeColumn"] = new JsonArray());
         Shape("quality as a string", o => o["quality"] = "good");
         Shape("an oversized option", o => o["clock"] = new string('c', 70_000));
-        if (untyped.Count != 0) throw new Exception("Trace CSV options raise untyped exceptions:" + Environment.NewLine + string.Join(Environment.NewLine, untyped));
+        if (untyped.Count != 0) throw new InvalidOperationException("Trace CSV options raise untyped exceptions:" + Environment.NewLine + string.Join(Environment.NewLine, untyped));
         Console.WriteLine($"PASS Trace CSV option shapes: {shapes} checks; {uncoded} wrong-typed values reach the caller uncoded; every one is now a coded refusal.");
     }
 

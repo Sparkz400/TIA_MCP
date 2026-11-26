@@ -9,7 +9,6 @@ from zipfile import ZipFile
 from io import BytesIO
 
 from qualify_translation_category_probe import scan_store, require, WindowsFiles
-from verify_watch_workflow import canonical_sha
 
 S = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
 # ExportProjectTexts labels view paths in the TIA UI language; German and English were observed natively.

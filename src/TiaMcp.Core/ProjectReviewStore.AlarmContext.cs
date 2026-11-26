@@ -5,10 +5,12 @@ namespace TiaMcp.Core;
 
 public sealed partial class ProjectReviewStore
 {
+    private static readonly string[] AlarmSelectorFields = new[] { "reviewId", "nodeId", "objectPath" };
+    private static readonly string[] EdgeSides = new[] { "source", "target" };
     internal static JsonObject AlarmContext(string reviewId, JsonObject review, JsonNode? value)
     {
         if (value is not JsonObject selector || selector.Count != 3 || selector.Any(p => p.Key is not ("reviewId" or "nodeId" or "objectPath")) ||
-            new[] { "reviewId", "nodeId", "objectPath" }.Any(key => selector[key] is not JsonValue v || !v.TryGetValue<string>(out var text) || string.IsNullOrWhiteSpace(text) || text.Length > 4096))
+            AlarmSelectorFields.Any(key => selector[key] is not JsonValue v || !v.TryGetValue<string>(out var text) || string.IsNullOrWhiteSpace(text) || text.Length > 4096))
             throw new BridgeException("InvalidRequest", "alarmContext requires only exact reviewId, nodeId and objectPath strings.");
         var model = review["model"]!.AsObject(); var nodes = NativeNodes(model);
         string path = Text(selector, "objectPath");
@@ -50,7 +52,7 @@ public sealed partial class ProjectReviewStore
         foreach (var edge in Rows(model["edges"]))
         {
             int edgeIndex = index++;
-            if (!new[] { "source", "target" }.Any(side => Text(edge?[side], "objectPath") == path || Text(edge?[side], "nodeId") == Text(selector, "nodeId"))) continue;
+            if (!EdgeSides.Any(side => Text(edge?[side], "objectPath") == path || Text(edge?[side], "nodeId") == Text(selector, "nodeId"))) continue;
             adjacent++;
             string status = edge?["unresolved"] is not null || Text(edge?["evidence"], "resolution") != "resolved" ||
                 Text(edge?["evidence"], "origin") is not ("nativeConfirmed" or "parsedSupported") ? "unresolvedEvidence" :

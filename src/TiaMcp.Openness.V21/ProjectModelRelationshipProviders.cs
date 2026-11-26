@@ -13,6 +13,9 @@ namespace TiaMcp.Indexing
     // edges. Endpoints resolve only through exact captured object paths.
     internal static class ProjectModelRelationshipProviders
     {
+        private static readonly string[] TagEdges = new[] { "configuredIo" };
+        private static readonly string[] LibraryEdges = new[] { "libraryVersion" };
+        private static readonly string[] CommonEdges = new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn" };
         private static readonly string[] PlcObjectKinds = { "plc", "blockGroup", "systemBlockGroup", "block", "typeGroup", "systemTypeGroup", "type",
             "tagGroup", "tagTable", "tag", "constant", "systemConstant", "technologyGroup", "softwareUnitGroup",
             "watchTableGroup", "watchTable", "forceTable", "externalSourceGroup", "externalSource" };
@@ -31,7 +34,7 @@ namespace TiaMcp.Indexing
             {
                 bool library = kind == "block" || kind == "type";
                 providers = library ? new[] { "nativeCrossReference", "plcLibraryInstances" } : new[] { "nativeCrossReference" };
-                edges = new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn" }.Concat(kind == "tag" ? new[] { "configuredIo" } : library ? new[] { "libraryVersion" } : new string[0]).ToArray();
+                edges = CommonEdges.Concat(kind == "tag" ? TagEdges : library ? LibraryEdges : new string[0]).ToArray();
             }
             else if ((kind ?? "").StartsWith("hmi", StringComparison.OrdinalIgnoreCase)) { providers = new[] { "hmi.relationships" }; edges = new[] { "hmiBinding", "screenNavigation", "libraryVersion" }; }
             else

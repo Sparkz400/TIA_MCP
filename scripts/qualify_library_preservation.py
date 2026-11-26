@@ -336,7 +336,6 @@ class Run:
 
 
 def create_type(run, name, composition, plc, restore=False):
-    h = run.h
     key = ("type:%s/types/%s" if composition == "types" else "block:%s/blocks/%s") % (plc, name)
     run.change("create type " + name, "library_create_type", {"schemaVersion": 1, "destinationLibraryId": run.pl, "documentDirectory": str(run.documents),
                "documentName": name, "targetEnvironment": "selectedPlc", "destinationComposition": composition, "target": {"plcPath": plc}},

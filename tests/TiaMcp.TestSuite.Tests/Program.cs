@@ -173,7 +173,7 @@ checks += ResultIntakeChecks.Run(args.Length == 1 ? args[0] + "-intake" : Path.C
 if (args.Length == 1)
 {
     var directory = Path.GetFullPath(args[0]);
-    if (Directory.Exists(directory)) throw new Exception("Use fresh fixture output to preserve existing evidence.");
+    if (Directory.Exists(directory)) throw new InvalidOperationException("Use fresh fixture output to preserve existing evidence.");
     Directory.CreateDirectory(directory);
     void Save(string name, object value) => File.WriteAllText(Path.Combine(directory, name), JsonSerializer.Serialize(value, BridgeProtocol.Json));
     Save("definition.json", definition.Manifest); Save("run.json", plan); Save("result.json", normalized);

@@ -36,7 +36,7 @@ void Check(bool condition, string label) { if (!condition) throw new Exception(l
 void Reject(Action action, string code)
 {
     try { action(); } catch (BridgeException e) when (e.Code == code) { passed++; return; }
-    throw new Exception("Expected refusal: " + code);
+    throw new InvalidOperationException("Expected refusal: " + code);
 }
 var baseline = new EngineeringObjectReference(new("P/Ω", "PLC/1", "Root", "DB/MotorA", "block"), new("capture-1", new('a', 64)), new('b', 64));
 EngineeringIdentityGuard.Validate(baseline); passed++;

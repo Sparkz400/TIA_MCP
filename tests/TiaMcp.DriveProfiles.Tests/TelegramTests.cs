@@ -12,9 +12,9 @@ internal static class TelegramTests
         string root = Path.Combine(parent, "telegrams-v2"); Directory.CreateDirectory(root);
         const string plc = "/projects/Fixture/devices/CPU/plc", other = "/projects/Fixture/devices/Other/plc";
         var checks = new List<string>();
-        void Check(bool ok, string message) { if (!ok) throw new Exception(message); checks.Add(message); }
+        void Check(bool ok, string message) { if (!ok) throw new InvalidOperationException(message); checks.Add(message); }
         void Reject(Action action, string message, string code = "InvalidDriveProfile")
-        { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, message); return; } throw new Exception("Expected refusal: " + message); }
+        { try { action(); } catch (BridgeException e) when (e.Code == code) { Check(true, message); return; } throw new InvalidOperationException("Expected refusal: " + message); }
         var model = originalReview["model"]!.DeepClone().AsObject();
         foreach (string path in new[] { plc, other }) model["nodes"]!.AsArray().Add(new JsonObject { ["nodeId"] = path, ["objectPath"] = path, ["kind"] = "plc", ["name"] = "CPU", ["parentId"] = "/projects/Fixture", ["metadata"] = new JsonObject() });
         var reviews = new ProjectReviewStore(root); string id = (string)reviews.Save(model, new(), new() { ["syntheticFixture"] = true })["reviewId"]!;
