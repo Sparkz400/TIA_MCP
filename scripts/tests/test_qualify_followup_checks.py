@@ -264,9 +264,11 @@ class StageBookkeeping(unittest.TestCase):
                 q.Client = original
 
     def test_main_refuses_artifacts_outside_the_repository(self):
-        with tempfile.TemporaryDirectory() as folder:
-            with self.assertRaises(SystemExit):
-                q.main(["--artifacts", folder])
+        # Beside the repository, never created: CI's TEMP lies inside the repository's artifacts, so a temp folder would not do.
+        outside = q.ROOT.parent / ("outside-" + os.urandom(4).hex())
+        with self.assertRaises(SystemExit):
+            q.main(["--artifacts", str(outside)])
+        self.assertFalse(outside.exists())
 
     def test_main_refuses_trust_without_running_instance(self):
         with self.assertRaises(SystemExit):
