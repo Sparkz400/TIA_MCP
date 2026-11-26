@@ -51,7 +51,8 @@ namespace TiaMcp.Openness.V21
             var project = SelectProject(args);
             var identity = args["target"] as JObject ?? throw new BridgeException("InvalidRequest", "An exact HMI identity (target) is required.");
             string kind = ChangeText(args, "kind", 64);
-            if (!kind.StartsWith("hmi_", StringComparison.Ordinal) || kind == "hmi_compile")
+            // A known HMI change kind only: any other hmi_* name was accepted and fingerprinted (natively on 26 November 2026).
+            if (!HmiEngineeringRules.IsFingerprintKind(kind))
                 throw new BridgeException("InvalidRequest", "kind must be the HMI change kind you will prepare, for example hmi_screen_create; the hash depends on its scope policy.");
             HmiValidateIdentity(project, identity);
             EnsureProjectOffline(project);

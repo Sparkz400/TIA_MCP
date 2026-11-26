@@ -364,6 +364,10 @@ namespace TiaMcp.Model
 
         internal static bool IsAdmittedKind(string kind) => kind != null && Kinds.ContainsKey(kind);
 
+        // The kinds hmi_content_fingerprint captures for: every HMI change kind, and the Classic screen edit with its lease.
+        internal static bool IsFingerprintKind(string kind) =>
+            kind == "hmi_engineering" || kind == "hmi_text_list_import" || kind == "hmi_classic_screen_edit" || IsAdmittedKind(kind);
+
         /// <summary>The coverage notes a kind accepts in place of a complete capture; null when it requires a complete one (hmi_engineering).</summary>
         internal static string[] StandingNotes(string kind)
             => kind == "hmi_classic_screen_edit" ? new[] { HmiPreservationRules.ClassicScreenExportNote }
