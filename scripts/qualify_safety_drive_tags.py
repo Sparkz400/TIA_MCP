@@ -40,7 +40,8 @@ def main():
     root = args.artifacts.resolve()
     root.mkdir(parents=True, exist_ok=False)
     helper = ROOT / 'scripts/native/TagImportFixture/bin/Debug/net48/TagImportFixture.exe'
-    client = Client(args.host.resolve(), 300, ['--worker', str(args.worker.resolve()), '--artifacts', str(root)])
+    # Scratch only: since 20 November the Host refuses safety writes unless it is launched with --enable-safety-changes.
+    client = Client(args.host.resolve(), 300, ['--worker', str(args.worker.resolve()), '--artifacts', str(root), '--enable-safety-changes'])
     report = {'completed': False, 'steps': []}
 
     def record(name, data):
