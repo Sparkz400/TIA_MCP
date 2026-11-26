@@ -88,6 +88,7 @@ try
             if (op == "trustClient") server.TrustedClientSha256 = command.RootElement.GetProperty("sha256").GetString();
             if (op == "failValueReads") server.FailValueReads = command.RootElement.GetProperty("value").GetInt32();
             if (op == "dropPublishResponses") server.DropPublishResponses = command.RootElement.GetProperty("value").GetInt32();
+            if (op == "sessionTimeout") server.GrantedSessionTimeoutMs = command.RootElement.GetProperty("value").GetDouble();
             if (op == "emitEvent") server.EmitEvent(command.RootElement.GetProperty("number").GetInt32(),command.RootElement.GetProperty("severity").GetUInt16());
             Save("server-live", new { sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() });
             Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray(), clientCertificates = server.ClientCertificateChecks.ToArray() }, BridgeProtocol.Json));

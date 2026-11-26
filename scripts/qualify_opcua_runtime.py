@@ -117,6 +117,9 @@ def main():
         threading.Thread(target=stderr_reader, daemon=True).start()
         check(json.loads(server_lines.get(timeout=30)).get("ready"), "Actual fixture server ready")
         ready = json.loads((out / "server/ready.json").read_text(encoding="utf-8"))
+        # Grant the Host's requested 600 s session timeout: the fixture's default 60 s would end a session across a stretch
+        # without UA requests on a slow machine, and the Host's idle sweep would then retire it mid-qualification.
+        fixture("sessionTimeout", value=600000)
         check(ready["processId"] == server.pid, "Fixture identity bound to original owned child")
         check(abs(dt.datetime.fromisoformat(ready["processBirthUtc"]).timestamp() - birth) < 0.02,
               "Managed fixture birth matches retained original process lifetime")

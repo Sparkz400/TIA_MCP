@@ -4,6 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 using Opc.Ua;
 using Opc.Ua.Server;
 using TiaMcp.Core.PhysicalRuntime;
+using TiaMcp.OpcUa.Runtime;
 
 namespace TiaMcp.OpcUa.Runtime.Tests;
 
@@ -49,6 +50,12 @@ internal sealed partial class FixtureServer : StandardServer
     internal double LastRequestedSessionTimeout;
     /// <summary>Replaces the client's requested session timeout (the server still clamps it to its own minimum and maximum).</summary>
     internal double? SessionTimeoutOverrideMs;
+    /// <summary>
+    /// The longest session timeout the fixture grants: 60 s by default, so the Host's 600 s request is revised as a server
+    /// with a shorter maximum revises it. A qualification runner raises it to the request (serve operation "sessionTimeout")
+    /// when its session must outlive a stretch without UA requests; the server's own maximum is that request.
+    /// </summary>
+    internal double GrantedSessionTimeoutMs = 60_000;
     internal int CloseDelayMs;
     internal int SessionCount => ServerInternal.SessionManager.GetSessions().Count;
     internal readonly TaskCompletionSource ReadEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -109,7 +116,7 @@ internal sealed partial class FixtureServer : StandardServer
                 UserTokenPolicies = [
                     new UserTokenPolicy { PolicyId = "anonymous", TokenType = UserTokenType.Anonymous },
                     new UserTokenPolicy { PolicyId = "username", TokenType = UserTokenType.UserName, SecurityPolicyUri = SecurityPolicies.Basic256Sha256 }],
-                MaxSessionCount = 16, MinSessionTimeout = 1000, MaxSessionTimeout = 60_000,
+                MaxSessionCount = 16, MinSessionTimeout = 1000, MaxSessionTimeout = OpcUaRuntimeClient.SessionTimeoutRequestMs,
                 MaxBrowseContinuationPoints = 16,
                 OperationLimits = new OperationLimits { MaxNodesPerBrowse = 32, MaxNodesPerRead = 256 }
             }
@@ -180,7 +187,7 @@ internal sealed partial class FixtureServer : StandardServer
         double timeout,uint maximumResponse,CancellationToken ct)
     {
         LastRequestedSessionTimeout=timeout;
-        var result=await base.CreateSessionAsync(channel,header,client,serverUri,endpointUrl,sessionName,nonce,certificate,SessionTimeoutOverrideMs??timeout,maximumResponse,ct);
+        var result=await base.CreateSessionAsync(channel,header,client,serverUri,endpointUrl,sessionName,nonce,certificate,Math.Min(SessionTimeoutOverrideMs??timeout,GrantedSessionTimeoutMs),maximumResponse,ct);
         if(AdvertisedEndpoint is not null)foreach(var endpoint in result.ServerEndpoints)endpoint.EndpointUrl=AdvertisedEndpoint;
         return result;
     }
