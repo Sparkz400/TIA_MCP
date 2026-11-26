@@ -1,0 +1,125 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.platform.lifecycle.20261126",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-26T08:23:23+00:00",
+  "source": {
+    "commit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_platform_lifecycle.py on Debug builds of 339ebb2d in one owned TIA V21 scratch (CPU 1511-1 PN): project_save with nothing to save, refusals of project_archive, project_close and project_open_copy over an unsaved edit (UnsavedProject), project_save of it; project_archive compressed and discardRestorableDataAndCompressed with hash-checked archives, an unknown mode refused; project_open_copy archiveAndRetrieve with equal inventory; project_close refusing and then discarding an unsaved edit in the copy; read-only reopen, project_archive refused there (ReadOnlyProject), project_save refused (ReadOnlyProject), project_open_copy closeAndCopyFolder; project_retrieve of the archive with equal inventory; a fresh owned PLCSIM instance provisioned without TLS trust held the attempt, simulation_provision_status listed it with its next calls, project_save was refused (ResourceBusy) and simulation_provision_recover detached, started, reconciled and reopened the scratch.",
+  "limitations": [
+    "TIA's Project.Archive writes into the open project's folder (observed: the .ap21, XRef.db, ProjectInfo.txt, System/PEData.*, the .info file); the report lists the files each step wrote. Content preservation is checked through the inventory and an unmodified project, not byte equality.",
+    "The trusted (successful) provisioning path is not part of this evidence; on 26 November it twice hit the card-staging access denial (0x80070005, no Restart Manager holder) when restoring the card. UMAC-protected projects are not covered."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "66da5fc3102436badb6d0b2ebdde462d159947dbe19120aafb296e47acc42b0e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3d1c2e226b883a8573972710cc4c64b520ee1ed47024cb55e9dab8dce64ae39a"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "807d9b2ddaa2e7eefe393a8fabbc3dab7d8d18cabe43f3a3fd2c3c1738bf6753"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "39ab63590ea3c9b04dc3ab94ae37322f218992b5d1c72bd0d4c8842e6368a6cb",
+      "bytes": 102151,
+      "completed": true,
+      "steps": [
+        "host_build_identity",
+        "tia_start",
+        "tia_create_scratch",
+        "inventory original",
+        "project_save first",
+        "project_simulation_enable save false",
+        "project_archive unsaved",
+        "project_close unsaved",
+        "project_open_copy unsaved",
+        "project_save with edits",
+        "project_save after save",
+        "project_archive compressed",
+        "project_archive discardRestorableDataAndCompressed",
+        "project_archive unknown mode",
+        "project folder files written by Project.Archive",
+        "inventory after archives",
+        "project_save after archives",
+        "project_open_copy read-write",
+        "inventory read-write copy",
+        "original folder files written by project_open_copy (read-write)",
+        "copy edit save false",
+        "project_close copy unsaved",
+        "project_close discardUnsaved",
+        "project_open read-only",
+        "project_archive read-only source (attempted)",
+        "project_save read-only",
+        "project_open_copy read-only",
+        "inventory read-only copy",
+        "project_close clean",
+        "original folder files written by the read-only open and copy",
+        "project_retrieve",
+        "inventory retrieved",
+        "project_close retrieved",
+        "original folder files written by project_retrieve",
+        "project_open scratch",
+        "sim_status",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "project_save after download",
+        "provisioning without TLS trust",
+        "simulation_provision_status held",
+        "project_save while held",
+        "simulation_provision_recover",
+        "sim_release refused instance",
+        "simulation_provision_status after recover",
+        "tia_session_status after recover",
+        "recover summary",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "host_build_identity",
+        "project_archive",
+        "project_close",
+        "project_inventory",
+        "project_open",
+        "project_open_copy",
+        "project_retrieve",
+        "project_save",
+        "sim_create",
+        "sim_release",
+        "sim_status",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_recover",
+        "simulation_provision_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_archive",
+        "project_close",
+        "project_open_copy",
+        "project_save",
+        "simulation_provision_scratch_credential"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.5.0",
+  "catalogVersion": "0.5.1",
   "targetTiaVersions": [
     21
   ],
@@ -5928,6 +5928,74 @@
       "limitations": [
         "Read-only V19 check of the shared worker loop; the AccessDenied and LicenseUnavailable mappings by exact Siemens type were not provoked natively."
       ]
+    },
+    {
+      "id": "local.plcsim.prune.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+        "passedScope": "scripts/qualify_sim_prune.py on Debug builds of 339ebb2d: five owned PLCSIM Advanced V8 CPU1511 instances on Softbus; four released with deleteOwned, one registered; two sim_storage archives of the registered one (powered on and off first), one changed by a byte; one ownership marker changed, one folder dated back three days, a junction in another; listing, delete by name, by age and by size cap, archive delete, and the release-then-delete of the last one."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.prune.20261126.json"
+      ],
+      "limitations": [
+        "Owned instances created by the run only; no TIA project or download. The by-age case uses folders whose file times the runner set back, not aged storage.",
+        "Not covered: a held link to an archive and storage left by another worker (orphaned) — orphaned instances are listed by sim_status, not deleted."
+      ]
+    },
+    {
+      "id": "local.plcsim.network-mode.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+        "passedScope": "scripts/qualify_sim_network_mode.py on Debug builds of 339ebb2d, as a standard Windows user, with the user's agreement to switch the machine-wide mode: refusals without acknowledgement, with a stale expectedCurrentMode and for an unknown mode left Softbus unchanged; Softbus to Softbus reported changed false; the switch to TCPIPSingleAdapter read back at once with tcpIpReady and no Runtime Manager restart; sim_create TCPIP succeeded; a switch while that instance was registered was refused with SimulationRegistrationsPresent naming it; Softbus was restored and read back."
+      },
+      "artifacts": [
+        "evidence/local.plcsim.network-mode.20261126.json"
+      ],
+      "limitations": [
+        "Standard user only; the administrator leg was not run. TCPIPMultipleAdapter was not set. Adapters and IP addresses were not changed.",
+        "The Runtime-Manager-lost subscription (OnRunTimemanagerLost) was not provoked."
+      ]
+    },
+    {
+      "id": "local.platform.lifecycle.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+        "passedScope": "scripts/qualify_platform_lifecycle.py on Debug builds of 339ebb2d in one owned TIA V21 scratch (CPU 1511-1 PN): project_save with nothing to save, refusals of project_archive, project_close and project_open_copy over an unsaved edit (UnsavedProject), project_save of it; project_archive compressed and discardRestorableDataAndCompressed with hash-checked archives, an unknown mode refused; project_open_copy archiveAndRetrieve with equal inventory; project_close refusing and then discarding an unsaved edit in the copy; read-only reopen, project_archive refused there (ReadOnlyProject), project_save refused (ReadOnlyProject), project_open_copy closeAndCopyFolder; project_retrieve of the archive with equal inventory; a fresh owned PLCSIM instance provisioned without TLS trust held the attempt, simulation_provision_status listed it with its next calls, project_save was refused (ResourceBusy) and simulation_provision_recover detached, started, reconciled and reopened the scratch."
+      },
+      "artifacts": [
+        "evidence/local.platform.lifecycle.20261126.json"
+      ],
+      "limitations": [
+        "TIA's Project.Archive writes into the open project's folder (observed: the .ap21, XRef.db, ProjectInfo.txt, System/PEData.*, the .info file); the report lists the files each step wrote. Content preservation is checked through the inventory and an unmodified project, not byte equality.",
+        "The trusted (successful) provisioning path is not part of this evidence; on 26 November it twice hit the card-staging access denial (0x80070005, no Restart Manager holder) when restoring the card. UMAC-protected projects are not covered."
+      ]
+    },
+    {
+      "id": "local.block-import.readback.20261126",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "LT-PRG2024-03",
+        "sourceCommit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+        "passedScope": "scripts/probe_block_import_readback.py on Debug builds of 339ebb2d in one owned TIA V21 scratch: an SCL FC and an optimized global DB through source_upsert, the LAD and FBD typed-graphical fixture FBs through block_import_xml; each block's export imported again; an edited SCL export imported. Every block_import_xml apply reported its block-import-content readback equal and the readbackVerified milestone done."
+      },
+      "artifacts": [
+        "evidence/local.block-import.readback.20261126.json"
+      ],
+      "limitations": [
+        "Four block shapes (SCL FC, optimized DB, LAD FB, FBD FB) on one CPU 1511-1 PN V4.1 in a German TIA installation; STL, GRAPH, instance DBs, standard-access DBs, protected and multi-block documents are not exercised. A difference is recorded, not failed.",
+        "Supplied fixture texts were stripped before import (a scratch in another language refuses them); supplied documents with non-empty multilingual texts are not exercised."
+      ]
     }
   ],
   "features": [
@@ -6426,13 +6494,15 @@
           "Unsaved edits are refused (UnsavedProject) because the project is never saved; the archive holds the last saved state.",
           "The archive is written under the Host's archives artifacts with a unique name; no other destination is accepted.",
           "Not a shared mutation: no admission record is written, because the project is not changed. A lost reply leaves at most an unreferenced archive file.",
-          "Archiving a read-only (secondary) project and protected (UMAC) projects are unprobed.",
-          "Native check on 14 November 2026 (not curated evidence): an owned 196-block fixture archived in 3.2 s, the archive was retrieved with project_retrieve in a fresh Portal and listed by project_inventory, the fixture folder hash was unchanged, and an unknown mode was refused (InvalidRequest)."
+          "Natively qualified on 26 November 2026 (local.platform.lifecycle.20261126): both modes with hash-checked archives under the archives artifacts, an unknown mode refused (InvalidRequest), UnsavedProject over an unsaved edit, and on a read-only (secondary) project TIA refuses Archive (ReadOnlyProject); the compressed archive retrieves with an equal inventory.",
+          "TIA's Project.Archive writes into the open project's folder although the project stays unmodified and is not saved (observed on 26 November: the .ap21, XRef.db, ProjectInfo.txt, System/PEData.* or only the .info file); byte equality of the folder is therefore not a property of archiving."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.platform.lifecycle.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6515,12 +6585,15 @@
         "status": "partial",
         "limitations": [
           "Worker-owned instances only; a user-owned TIA is never changed.",
-          "Unsaved edits are refused unless discardUnsaved is true; nothing is ever saved."
+          "Unsaved edits are refused unless discardUnsaved is true; nothing is ever saved.",
+          "Natively qualified on 26 November 2026 (local.platform.lifecycle.20261126): UnsavedProject over an unsaved edit, discardUnsaved closing the copy with unsavedEditsDiscarded true, and a clean close; openProjects is empty afterwards."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.platform.lifecycle.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6555,12 +6628,15 @@
         "status": "partial",
         "limitations": [
           "Worker-owned instances only; a user-owned TIA is never saved.",
-          "Read-only projects, projects with an unresolved change and any unresolved admission holding a project are refused; no recovery archive is taken."
+          "Read-only projects, projects with an unresolved change and any unresolved admission holding a project are refused; no recovery archive is taken.",
+          "Natively qualified on 26 November 2026 (local.platform.lifecycle.20261126): nothing to save (saved false), an unsaved project_simulation_enable edit saved (modifiedBefore true, isModifiedAfter false), ReadOnlyProject on a read-only reopen and ResourceBusy while a provisioning attempt was held."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.platform.lifecycle.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6595,12 +6671,15 @@
         "status": "implemented",
         "limitations": [
           "Reads the Host's admission records and the storage folders they name; does not check PLCSIM registrations (sim_status does) or the project.",
-          "Next calls are a plan; a new provisioning attempt needs the user's TLS authorization again."
+          "Next calls are a plan; a new provisioning attempt needs the user's TLS authorization again.",
+          "Natively qualified on 26 November 2026 (local.platform.lifecycle.20261126): an attempt refused without TLS trust listed as held (outcomeUnknown) with its next calls, and no held attempt after simulation_provision_recover."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.platform.lifecycle.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6634,12 +6713,15 @@
         "status": "partial",
         "limitations": [
           "Refused while any open project has unsaved edits (detaching discards them); stops at the first failure or a held reconciliation.",
-          "Never powers, downloads, provisions, saves or replays; a fresh instance and a new provisioning attempt stay separate calls."
+          "Never powers, downloads, provisions, saves or replays; a fresh instance and a new provisioning attempt stay separate calls.",
+          "Natively qualified on 26 November 2026 (local.platform.lifecycle.20261126): detach, an empty owned Portal, the reconciliation (released) and the reopen of the scratch in one call after a refused-TLS attempt. On two other runs that day the attempt could not restore the original card (access denied, see the card-staging item in docs/TODO.md) and reconciliation then refused with \"Memory card cannot contain a reparse point\"; recover stopped there, as designed."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.platform.lifecycle.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6910,12 +6992,15 @@
         "limitations": [
           "Needs exactly one open, saved project in a worker-owned instance; it archives it, closes it and leaves the retrieved copy open.",
           "The original project's files are never written; the copy lives under the Host's copies artifacts.",
-          "A read-only (secondary) source is closed and its saved folder copied file by file, because V21 refuses Project.Archive on a secondary project (natively observed on 14 November 2026: 'The operation is not permitted in a read-only context')."
+          "A read-only (secondary) source is closed and its saved folder copied file by file, because V21 refuses Project.Archive on a secondary project (natively observed on 14 November 2026: 'The operation is not permitted in a read-only context').",
+          "Natively qualified on 26 November 2026 (local.platform.lifecycle.20261126): archiveAndRetrieve from a read-write scratch and closeAndCopyFolder from a read-only reopen, each with an inventory equal to the original; UnsavedProject over an unsaved edit; the read-only route left the original folder byte-identical."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.platform.lifecycle.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9413,12 +9498,14 @@
         "limitations": [
           "Opt-in: without delete it only lists. delete:true needs names, olderThanDays or maxTotalMegabytes; at most 200 deletions per call.",
           "Deletes only the storage folder of an instance whose signed creation receipt says it was unregistered, that is neither registered nor selected, whose ownership marker still matches the receipt and that holds no link; and archives whose receipt still matches their SHA-256 and size. Everything else is listed with its refusal.",
-          "File logic verified offline against temporary folders; not run against a live PLCSIM installation."
+          "Natively qualified on 26 November 2026 on owned PLCSIM Advanced V8 instances (local.plcsim.prune.20261126): listing, delete by name, by age and by size cap, archive delete, and the refusals ownershipMarkerChanged, registeredOrSelected, containsReparsePoint and archiveReceiptMismatch."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim.prune.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9457,12 +9544,14 @@
           "Machine-wide: the mode applies to every PLCSIM instance and Windows user on the PC. acknowledgeMachineWide must be true (AcknowledgementRequired, checked by the Host before any worker call and again by the worker); no other tool changes the mode.",
           "Refused while any PLCSIM instance is registered, owned or not (SimulationRegistrationsPresent, listing them), stricter than the API, which refuses only a running instance; refused when expectedCurrentMode differs from the observed mode (SimulationNetworkModeStale) and when PLCSIM reports UnknownState (SimulationNetworkModeUnknown). The current mode is a no-op (changed false).",
           "The mode is read back for up to 5 s (SimulationNetworkModeReadbackMismatch otherwise); a PLCSIM refusal is SimulationNetworkModeSetFailed with its runtime error code and a remediation. Adapter bindings, mappings and IP addresses are never changed (SetNetInterfaceBindings needs administrator rights).",
-          "Decision rules verified offline (SimulationNetworkModeSwitch); not run against a live PLCSIM installation, so administrator rights, a Runtime Manager restart and the readback timing are unobserved."
+          "Natively qualified on 26 November 2026 as a standard Windows user (local.plcsim.network-mode.20261126): the switch from Softbus to TCPIPSingleAdapter read back at once (29 ms in the first run) with tcpIpReady and no Runtime Manager restart, SimulationRegistrationsPresent while an instance was registered, and the restore of Softbus. The administrator leg and TCPIPMultipleAdapter are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim.network-mode.20261126"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9972,7 +10061,8 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Content readback after compile (local.block-import.readback.20261126): each supplied block is exported again without DocumentInfo and compared ignoring empty multilingual texts, whitespace in ObjectList containers, formatting and ID numbering; an equal block reports readbackVerified done, a difference is recorded in the block-import-content readback without failing the change. Verified for an SCL FC, an optimized DB and LAD/FBD FBs."
         ]
       },
       "qualification": {
@@ -9980,7 +10070,8 @@
         "evidenceIds": [
           "local.milestones.rerun.20261028",
           "local.plc_object_mutations.rerun.20261028",
-          "local.safety.fio-block-routes.20261102"
+          "local.safety.fio-block-routes.20261102",
+          "local.block-import.readback.20261126"
         ]
       },
       "availability": {

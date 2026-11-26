@@ -5,6 +5,16 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 26 November 2026
+
+**Native runs on owned scratch projects:** catalog `0.5.1` binds `project_save`, `project_close`, `project_archive`,
+`project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune` and
+`sim_network_mode_set` (2,102 bound, 63 open, 72 blocked, 3 descoped cells) and adds a content readback to
+`block_import_xml`, each with curated evidence of the same day ([record](../verification/native-runs-20261126.md)).
+The runs found a 0.9.0 regression (every successful `project_snapshot_capture` failed while adding `remoteAccess`;
+fixed), that TIA's `Project.Archive` writes into the open project's folder, and a recurrence of the card-staging
+access denial. The D12 Web API rows stay open: their TCP/IP run was blocked by the PLCSIM adapter's address.
+
 ## 25 November 2026
 
 **Audit follow-ups (offline):** no entry was written here between 3 and 25 November; that work is recorded in the

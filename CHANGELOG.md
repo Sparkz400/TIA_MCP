@@ -14,6 +14,10 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 - `block_import_xml` reads every imported block back after compile and compares it with the supplied SimaticML, ignoring export provenance (`DocumentInfo`), empty multilingual texts, formatting and ID numbering; an equal block reports the `readbackVerified` milestone `done` (`block_import_content_verified`), a difference is recorded in the `block-import-content` readback and leaves it `notRecorded` without failing the change. The rule comes from native exports of LAD and FBD FBs, an SCL FC and an optimized DB on 26 November.
 
+### Changed
+
+- Catalog `0.5.1`: `project_save`, `project_close`, `project_archive`, `project_open_copy`, `simulation_provision_status`, `simulation_provision_recover`, `sim_prune` and `sim_network_mode_set` are natively verified on owned scratch projects and instances ([record](docs/verification/native-runs-20261126.md)); `project_archive` documents that TIA's archive writes into the open project's folder.
+
 ### Fixed
 
 - `project_snapshot_capture` failed every successful capture with `ProjectReviewFailed` ("System.Int32 cannot be converted to System.Int64") while it added `remoteAccess` to the saved review, since 20 November (in 0.9.0). The review's byte count is now stored as a 64-bit number and read in either width.

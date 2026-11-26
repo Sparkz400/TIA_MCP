@@ -1,0 +1,78 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.block-import.readback.20261126",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-26T08:25:23+00:00",
+  "source": {
+    "commit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/probe_block_import_readback.py on Debug builds of 339ebb2d in one owned TIA V21 scratch: an SCL FC and an optimized global DB through source_upsert, the LAD and FBD typed-graphical fixture FBs through block_import_xml; each block's export imported again; an edited SCL export imported. Every block_import_xml apply reported its block-import-content readback equal and the readbackVerified milestone done.",
+  "limitations": [
+    "Four block shapes (SCL FC, optimized DB, LAD FB, FBD FB) on one CPU 1511-1 PN V4.1 in a German TIA installation; STL, GRAPH, instance DBs, standard-access DBs, protected and multi-block documents are not exercised. A difference is recorded, not failed.",
+    "Supplied fixture texts were stripped before import (a scratch in another language refuses them); supplied documents with non-empty multilingual texts are not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "66da5fc3102436badb6d0b2ebdde462d159947dbe19120aafb296e47acc42b0e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3d1c2e226b883a8573972710cc4c64b520ee1ed47024cb55e9dab8dce64ae39a"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "807d9b2ddaa2e7eefe393a8fabbc3dab7d8d18cabe43f3a3fd2c3c1738bf6753"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "a3fdc9f9e65b1ee46ca1ab4366843b5db6d3177f074deecce29efda0102c060f",
+      "bytes": 43136,
+      "completed": true,
+      "steps": [
+        "host_build_identity",
+        "tia_create_scratch",
+        "source_upsert SCL FC",
+        "source_upsert DB",
+        "block_import_xml Tgp_Boolean_LAD",
+        "block_import_xml Tgp_Boolean_FBD",
+        "supplied vs export Tgp_Boolean_LAD",
+        "supplied vs export Tgp_Boolean_FBD",
+        "round trip import RbScl",
+        "round trip RbScl",
+        "round trip import RbDb",
+        "round trip RbDb",
+        "round trip import Tgp_Boolean_LAD",
+        "round trip Tgp_Boolean_LAD",
+        "round trip import Tgp_Boolean_FBD",
+        "round trip Tgp_Boolean_FBD",
+        "edited supplied text differs",
+        "import edited RbScl",
+        "edited import visible in re-export",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "host_build_identity",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

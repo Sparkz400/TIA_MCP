@@ -262,14 +262,14 @@ release. A deprecated tool names the release that deprecated it and its replacem
 
 | Tool | Feature | Support | Toolset | 1.0 contract | Host option | Also in |
 | --- | --- | --- | --- | --- | --- | --- |
-| `project_archive` | Archive an open project's saved state as a .zap21 file | unqualified | core | experimental |  |  |
-| `project_close` | Close a project in a worker-owned instance without saving | unqualified | core | experimental |  |  |
+| `project_archive` | Archive an open project's saved state as a .zap21 file | limited | core | frozen |  |  |
+| `project_close` | Close a project in a worker-owned instance without saving | limited | core | frozen |  |  |
 | `project_copy` | Copy an open project's saved state to a new owned directory | limited | core | frozen |  |  |
 | `project_open` | Open an exact V21 project in an owned session | shipped | core | frozen |  | `project_open.read_only`, `project_open.umac_login` |
-| `project_open_copy` | Swap the open project for a read-write copy of its saved state | unqualified | core | experimental |  |  |
+| `project_open_copy` | Swap the open project for a read-write copy of its saved state | limited | core | frozen |  |  |
 | `project_properties` | Read project metadata, history, languages and text categories | limited | core | frozen |  |  |
 | `project_retrieve` | Retrieve a hash-verified checkpoint to a new directory | shipped | core | frozen |  |  |
-| `project_save` | Save a project in a worker-owned instance | unqualified | core | experimental |  |  |
+| `project_save` | Save a project in a worker-owned instance | limited | core | frozen |  |  |
 | `project_upgrade` | Upgrade a V14-V20 project or archive to V21 on an owned copy | limited | core | frozen |  |  |
 | `tia_create_scratch` | Create a catalog-selected isolated reference project | shipped | core | frozen |  |  |
 
@@ -403,9 +403,9 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | `sim_create` | Create a new owned simulated CPU | shipped | simulation | frozen |  |  |
 | `sim_creation_status` | Inspect durable simulator creation and original worker exit | limited | simulation | frozen |  |  |
 | `sim_event` | Inject interrupts and faults into an owned running simulated CPU | limited | simulation | frozen |  |  |
-| `sim_network_mode_set` | Switch the machine-wide PLCSIM Advanced network mode after an explicit acknowledgement | unqualified | simulation | experimental |  |  |
+| `sim_network_mode_set` | Switch the machine-wide PLCSIM Advanced network mode after an explicit acknowledgement | shipped | simulation | frozen |  |  |
 | `sim_observe` | Observe the operating state, LEDs and display of a simulated CPU | limited | simulation | frozen |  |  |
-| `sim_prune` | Prune storage and archives this adapter created for unregistered simulators | unqualified | simulation | experimental |  |  |
+| `sim_prune` | Prune storage and archives this adapter created for unregistered simulators | limited | simulation | frozen |  |  |
 | `sim_read` | Read typed simulated values | shipped | simulation | frozen |  |  |
 | `sim_read_signals` | Read several typed simulated values in one runtime call | limited | simulation | frozen |  |  |
 | `sim_record` | Answer a program's data record requests on an owned simulated CPU | limited | simulation | frozen |  |  |
@@ -422,9 +422,9 @@ release. A deprecated tool names the release that deprecated it and its replacem
 | `simulation_discovery_baseline` | Record PLCSIM discovery before owned instance registration | limited | simulation | frozen |  |  |
 | `simulation_download` | Generate a verified owned virtual memory card | shipped | simulation | frozen |  |  |
 | `simulation_provision_reconcile` | Release a failed provisioning admission on fresh native evidence | shipped | simulation | frozen |  |  |
-| `simulation_provision_recover` | Recover from a held provisioning attempt in one call | unqualified | simulation | experimental |  |  |
+| `simulation_provision_recover` | Recover from a held provisioning attempt in one call | limited | simulation | frozen |  |  |
 | `simulation_provision_scratch_credential` | Provision the existing protected scratch credential to an owned virtual CPU | limited | simulation | frozen |  |  |
-| `simulation_provision_status` | List provisioning attempts with their stage and the next calls | unqualified | simulation | experimental |  |  |
+| `simulation_provision_status` | List provisioning attempts with their stage and the next calls | shipped | simulation | frozen |  |  |
 
 ## software_units
 

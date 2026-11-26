@@ -1,0 +1,71 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plcsim.network-mode.20261126",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-26T08:18:50+00:00",
+  "source": {
+    "commit": "339ebb2d8a9d2c85beae68450fbd92e190749252",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "LT-PRG2024-03",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_sim_network_mode.py on Debug builds of 339ebb2d, as a standard Windows user, with the user's agreement to switch the machine-wide mode: refusals without acknowledgement, with a stale expectedCurrentMode and for an unknown mode left Softbus unchanged; Softbus to Softbus reported changed false; the switch to TCPIPSingleAdapter read back at once with tcpIpReady and no Runtime Manager restart; sim_create TCPIP succeeded; a switch while that instance was registered was refused with SimulationRegistrationsPresent naming it; Softbus was restored and read back.",
+  "limitations": [
+    "Standard user only; the administrator leg was not run. TCPIPMultipleAdapter was not set. Adapters and IP addresses were not changed.",
+    "The Runtime-Manager-lost subscription (OnRunTimemanagerLost) was not provoked."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "66da5fc3102436badb6d0b2ebdde462d159947dbe19120aafb296e47acc42b0e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3d1c2e226b883a8573972710cc4c64b520ee1ed47024cb55e9dab8dce64ae39a"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "807d9b2ddaa2e7eefe393a8fabbc3dab7d8d18cabe43f3a3fd2c3c1738bf6753"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "7c2c759449050d5eafc749dfed2d0a9d2e8f6c57aa29326884d590e24431701b",
+      "bytes": 21574,
+      "completed": true,
+      "steps": [
+        "host_build_identity",
+        "sim_status original",
+        "refused without acknowledgement",
+        "refused with a stale expectedCurrentMode",
+        "refused unknown mode",
+        "same mode left alone",
+        "switch to TCPIPSingleAdapter",
+        "sim_status after switch",
+        "runtime manager restart needed",
+        "sim_create TCPIP",
+        "refused while an instance is registered",
+        "sim_release TCPIP instance",
+        "restore Softbus",
+        "sim_status restored"
+      ],
+      "toolsPassed": [
+        "host_build_identity",
+        "sim_create",
+        "sim_network_mode_set",
+        "sim_release",
+        "sim_status"
+      ],
+      "toolsRejected": [
+        "sim_network_mode_set"
+      ]
+    }
+  ]
+}
